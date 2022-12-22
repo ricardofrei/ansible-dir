@@ -30,6 +30,7 @@
     apt:
       name: grafana={{ grafana_version }}
       state: present
+      update_cache: yes
 
   - name: Create Grafana user
     user:
