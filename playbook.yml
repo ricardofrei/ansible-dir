@@ -74,13 +74,6 @@
       name: prometheus
       state: present
 
-  - name: Change ownership of Prometheus directory
-    file:
-      path: /opt/prometheus-{{ prometheus_version }}.linux-amd64
-      owner: prometheus
-      group: prometheus
-      mode: '0755'
-
   - name: Create Prometheus configuration directory
     file:
       path: /etc/prometheus
