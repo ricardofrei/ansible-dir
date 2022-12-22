@@ -17,7 +17,7 @@
 
   - name: Add specified repository into sources list
     ansible.builtin.apt_repository:
-      repo: deb http://archive.canonical.com/ubuntu hardy partner
+      repo: deb https://apt.grafana.com stable main
       state: present
 
   - name: Install grafana
