@@ -1,7 +1,7 @@
 ---
 - name: Install Prometheus and Grafana
   hosts: all
-  sudo: yes
+  become: true
   vars:
     prometheus_version: 2.23.0
     grafana_version: 7.5.2
