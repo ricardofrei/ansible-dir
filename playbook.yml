@@ -24,9 +24,7 @@
       mode: '0440'
 
   - name: Add specified repository into sources list
-    ansible.builtin.apt_repository:
-      repo: deb [signed-by=/usr/share/keyrings/grafana.key] https://apt.grafana.com stable main
-      state: present
+    command: echo "deb [signed-by=/usr/share/keyrings/grafana.key] https://apt.grafana.com beta main" | sudo tee -a /etc/apt/sources.list.d/grafana.list
 
   - name: Install grafana
     apt:
