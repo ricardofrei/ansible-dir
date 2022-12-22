@@ -65,7 +65,7 @@
 
   - name: Enable and start grafana service
     systemd:
-      name: grafana
+      name: grafana-server
       state: started
       enabled: yes
 
