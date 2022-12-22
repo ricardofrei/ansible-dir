@@ -2,7 +2,7 @@
 - name: Install Prometheus and Grafana
   hosts: all
   become: true
-  become_user: ricsve
+  become_user: root
   vars:
     prometheus_version: 2.23.0
     grafana_version: 7.5.2
@@ -16,17 +16,57 @@
       - tar
       - curl
 
-  - name: Download Prometheus
-    get_url:
-      url: https://github.com/prometheus/prometheus/releases/download/v{{ prometheus_version }}/prometheus-{{ prometheus_version }}.linux-amd64.tar.gz
-      dest: /tmp/prometheus.tar.gz
-    become: yes
+  - name: Add specified repository into sources list
+    ansible.builtin.apt_repository:
+      repo: deb http://archive.canonical.com/ubuntu hardy partner
+      state: present
 
-  - name: Extract Prometheus
-    unarchive:
-      src: /tmp/prometheus.tar.gz
-      dest: /opt/
-      remote_src: yes
+  - name: Install grafana
+    apt:
+      name: grafana={{ grafana_version }}
+      state: present
+
+  - name: Create Grafana user
+    user:
+      name: grafana
+      group: grafana
+      home: /opt/grafana-{{ grafana_version }}.linux-amd64
+      shell: /sbin/nologin
+      createhome: yes
+
+  - name: Change ownership of grafana directory
+    file:
+      path: /opt/grafana-{{ grafana_version }}.linux-amd64
+      owner: grafana
+      group: grafana
+      mode: '0755'
+
+  - name: Create grafana configuration directory
+    file:
+      path: /etc/grafana
+      owner: grafana
+      group: grafana
+      mode: '0755'
+      state: directory
+
+  - name: Copy Grafana configuration file
+    template:
+      src: templates/grafana.ini.j2
+      dest: /etc/grafana/grafana.yml
+      owner: grafana
+      group: grafana
+      mode: '0644'
+
+  - name: Enable and start grafana service
+    systemd:
+      name: grafana
+      state: started
+      enabled: yes
+
+  - name: Install Promotheus
+    apt:
+      name: prometheus={{ prometheus_version }}
+      state: present
 
   - name: Create Prometheus user
     user:
@@ -62,54 +102,5 @@
   - name: Enable and start Prometheus service
     systemd:
       name: prometheus
-      state: started
-      enabled: yes
-
-  - name: Download Grafana
-    get_url:
-      url: https://dl.grafana.com/oss/release/grafana-{{ grafana_version }}.linux-amd64.tar.gz
-      dest: /tmp/grafana.tar.gz
-    become: yes
-
-  - name: Extract Grafana
-    unarchive:
-      src: /tmp/grafana.tar.gz
-      dest: /opt/
-      remote_src: yes
-
-  - name: Create Grafana user
-    user:
-      name: grafana
-      group: grafana
-      home: /opt/grafana-{{ grafana_version }}.linux-amd64
-      shell: /sbin/nologin
-      createhome: yes
-
-  - name: Change ownership of Prometheus directory
-    file:
-      path: /opt/grafana-{{ grafana_version }}.linux-amd64
-      owner: prometheus
-      group: prometheus
-      mode: '0755'
-
-  - name: Create grafana configuration directory
-    file:
-      path: /etc/grafana
-      owner: grafana
-      group: grafana
-      mode: '0755'
-      state: directory
-
-  - name: Copy Prometheus configuration file
-    template:
-      src: templates/grafana.ini.j2
-      dest: /etc/grafana/grafana.yml
-      owner: grafana
-      group: grafana
-      mode: '0644'
-
-  - name: Enable and start Prometheus service
-    systemd:
-      name: grafana-server
       state: started
       enabled: yes
