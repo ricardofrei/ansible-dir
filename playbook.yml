@@ -28,7 +28,7 @@
 
   - name: Install grafana
     apt:
-      name: grafana={{ grafana_version }}
+      name: grafana
       state: present
       update_cache: yes
 
@@ -71,7 +71,7 @@
 
   - name: Install Promotheus
     apt:
-      name: prometheus={{ prometheus_version }}
+      name: prometheus
       state: present
 
   - name: Create Prometheus user
