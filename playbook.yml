@@ -74,14 +74,6 @@
       name: prometheus
       state: present
 
-  - name: Create Prometheus user
-    user:
-      name: prometheus
-      group: prometheus
-      home: /opt/prometheus-{{ prometheus_version }}.linux-amd64
-      shell: /sbin/nologin
-      createhome: yes
-
   - name: Change ownership of Prometheus directory
     file:
       path: /opt/prometheus-{{ prometheus_version }}.linux-amd64
