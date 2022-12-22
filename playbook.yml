@@ -1,0 +1,70 @@
+name: Install Prometheus and Grafana
+  hosts: all
+  become: true
+  vars:
+    prometheus_version: 2.24.0
+    grafana_version: 7.3.4
+  tasks:
+    name: Create directories for Prometheus and Grafana
+      file:
+        path: /opt/prometheus
+        state: directory
+        owner: root
+        group: root
+        mode: 0755
+      file:
+        path: /opt/grafana
+        state: directory
+        owner: root
+        group: root
+        mode: 0755
+    
+    name: Download Prometheus
+      get_url:
+        url: https://github.com/prometheus/prometheus/releases/download/v{{ prometheus_version }}/prometheus-{{ prometheus_version }}.linux-amd64.tar.gz
+      dest: /opt/prometheus
+
+    name: Extract Prometheus
+      unarchive:
+        src: /opt/prometheus/prometheus-{{ prometheus_version }}.linux-amd64.tar.gz
+        dest: /opt/prometheus
+        copy: no
+
+    name: Download Grafana
+      get_url:
+        https://dl.grafana.com/oss/release/grafana-{{ grafana_version }}.linux-amd64.tar.gz
+      dest: /opt/grafana
+
+    name: Extract Grafana
+      unarchive:
+        src: /opt/grafana/grafana-{{ grafana_version }}.linux-amd64.tar.gz
+        dest: /opt/grafana
+        copy: no
+
+    name: Create Prometheus configuration file
+      template:
+        src: templates/prometheus.yml.j2
+        dest: /opt/prometheus/prometheus.yml
+        owner: root
+        group: root
+        mode: 0644
+
+    name: Create Grafana configuration file
+      template:
+      src: templates/grafana.ini.j2
+      dest: /opt/grafana/conf/grafana.ini
+      owner: root
+      group: root
+      mode: 0644
+
+    name: Start Prometheus
+      command: /opt/prometheus/prometheus --config.file=/opt/prometheus/prometheus.yml
+      async: 7200
+      poll: 0
+      become: true
+    
+    name: Start Grafana
+      command: /opt/grafana/bin/grafana-server --config=/opt/grafana/conf/grafana.ini
+      async: 7200
+      poll: 0
+      become: true
