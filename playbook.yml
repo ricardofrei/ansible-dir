@@ -2,7 +2,7 @@
 - name: Install Prometheus and Grafana
   hosts: all
   become: true
-  become_user: ricsve
+  become_user: root
   vars:
     prometheus_version: 2.23.0
     grafana_version: 7.5.2
