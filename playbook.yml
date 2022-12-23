@@ -77,7 +77,6 @@
       owner: root
       group: root
       mode: 0755
-    notify: reload_daemon_and_restart_node_exporter
   - meta: flush_handlers
   
   - name: service always started
